@@ -146,7 +146,7 @@ int read_args(int argc, char** argv,
   {
     std::string binPath = getCurrentWorkingDir();
     std::cout << binPath << std::endl;
-    std::size_t found = binPath.find("covo_vim");
+    std::size_t found = binPath.find("covo");
     if (found != std::string::npos)
     {
       console->info("Your project root folder found automatically: " + binPath.substr(0, found+9));
@@ -157,7 +157,7 @@ int read_args(int argc, char** argv,
           "Please, provide as a argument");
     }
 
-    projectRootFolder = binPath.substr(0, found+9);
+    projectRootFolder = binPath.substr(0, found+5);
     settingsFilePath = projectRootFolder + "param_settings/SETTINGS.json";
     datasetRootFolder = projectRootFolder + "docs/sample_dataset/";
   }
