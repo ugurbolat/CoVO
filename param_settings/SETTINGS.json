@@ -1,0 +1,54 @@
+{
+  "dataset": "TUM_RGBD_FR1",
+  "dataset_type": "RAW",
+  "feature_descriptor_choice": "ORB",
+  "initial_pose": [0, 0, 0, 0, 0, 0, 1],
+  "initial_timestamp": 0,
+  "covo_settings": {
+    "ransac_threshold": 10,
+    "depth_near_point_cloud_threshold_in_m": 0.5,
+    "depth_far_point_cloud_threshold_in_m": 5,
+    "uncertainty_u_in_pixels": 3,
+    "uncertainty_v_in_pixels": 3,
+    "uncertainty_depth_model": "NGUYEN_QUADRATIC_ONLY",
+    "keyframe_ref_n_feature_threshold": 250,
+    "insufficient_n_feature_threshold": 80,
+    "n_skipped_frame": 0
+  },
+  "ceres_settings": {
+    "linear_solver_type": "DENSE_SCHUR",
+    "max_iterations": 10,
+    "minimizer_progress_to_stdout": true,
+    "function_tolerance": 1.0e-6,
+    "parameter_tolerance": 1.0e-6,
+    "gradient_tolerance": 1.0e-6,
+    "loss_function_type": "NULL",
+    "loss_function_threshold": 0,
+    "covariance_algorithm_type": "DENSE_SVD"
+  },
+  "camera_settings": {
+    "fx": 517.3,
+    "fy": 516.5,
+    "cx": 318.6,
+    "cy": 255.3,
+    "scale": 5000,
+    "k1": 0.2624,
+    "k2": -0.9531,
+    "k3": 1.1633,
+    "p1": -0.0054,
+    "p2": 0.0026
+  },
+  "feature_settings": {
+    "n_features": 1000,
+    "scale_factor": 1.2,
+    "n_levels": 8,
+    "edge_threshold": "DEFAULT",
+    "first_level": "DEFAULT",
+    "wta_k": "DEFAULT",
+    "score_type": "DEFAULT",
+    "patch_size": "DEFAULT",
+    "fast_threshold": "DEFAULT",
+    "filter_score_percentage": 75
+  },
+  "matcher_settings": "BRUTEFORCE_HAMMING"
+}
