@@ -1,0 +1,11 @@
+{
+  "n_features": 1000,
+  "scale_factor": 1.2,
+  "n_levels": 8,
+  "edge_threshold": "DEFAULT",
+  "first_level": "DEFAULT",
+  "wta_k": "DEFAULT",
+  "score_type": "DEFAULT",
+  "patch_size": "DEFAULT",
+  "fast_threshold": "DEFAULT"
+}
