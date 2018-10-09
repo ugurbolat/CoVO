@@ -15,7 +15,7 @@ namespace covo
       void drawFeatureDescriptor();
       const std::vector<cv::KeyPoint> getKeyPoints() const;
       const cv::Mat getDescriptors() const;
-      bool isSufficientKeyPoints() const;
+      bool isSufficientNoKeyPoints() const;
       const cv::Mat getImage() const;
     private:
       const nlohmann::json COVO_SETTINGS;

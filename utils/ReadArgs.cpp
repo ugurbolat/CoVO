@@ -173,7 +173,7 @@ int read_args(int argc, char** argv,
       return 0;
     }
     ifSettings >> *COVO_SETTINGS;
-    console->trace(COVO_SETTINGS->dump(2));
+    console->debug(COVO_SETTINGS->dump(2));
   }
   else  // default path used for settings.json
   {
@@ -186,7 +186,7 @@ int read_args(int argc, char** argv,
       return 0;
     }
     ifSettings >> *COVO_SETTINGS;
-    console->trace(COVO_SETTINGS->dump(2));
+    console->debug(COVO_SETTINGS->dump(2));
   }
 
   int waitKeySettings;
