@@ -54,7 +54,7 @@ const cv::Mat covo::Feature::getDescriptors() const
   return descriptors;
 }
 
-bool covo::Feature::isSufficientKeyPoints() const
+bool covo::Feature::isSufficientNoKeyPoints() const
 {
   if (keyPoints.size() < 
       COVO_SETTINGS["covo_settings"]["insufficient_n_feature_threshold"])

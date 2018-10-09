@@ -4,6 +4,8 @@
 #include <nlohmann/json.hpp>
 #include <opencv2/opencv.hpp>
 
+typedef std::vector<cv::Point3f> PointMatrixXYZ;
+typedef std::vector<cv::Point3f> PointMatrixUVD;
 
 namespace covo
 {
@@ -12,22 +14,37 @@ namespace covo
     public:
       Matcher(
           const nlohmann::json&, 
+          const cv::Mat&,
+          const cv::Mat&,
+          const cv::Mat&,
+          const cv::Mat&,
           const covo::Feature&,
           const covo::Feature&
-          //const std::vector<cv::KeyPoint>&,
-          //const std::vector<cv::KeyPoint>&,
-          //const std::Mat&,
-          //const std::Mat&
           );
       void findMatches();
       void filterOutliers();
       const std::string getCovoMatcherSettings() const;
-      void drawMatches() const;
+      void drawMatches(const std::string&) const;
+      bool isSufficientNoMatches() const;
+
+    private:
+      cv::Point3f cloudifyUV2XYZ(const cv::Point2f&, const cv::Mat&);
+      cv::Point3f convertUV2UVD(const cv::Point2f&, const cv::Mat&);
+
     private:
       const nlohmann::json COVO_SETTINGS;
+      const cv::Mat& rgbImg1;
+      const cv::Mat& depthImg1;
+      const cv::Mat& rgbImg2;
+      const cv::Mat& depthImg2;
       const covo::Feature feature1;
       const covo::Feature feature2;
       std::vector<cv::DMatch> matches;
-  };
+
+      PointMatrixXYZ xyz1;
+      PointMatrixUVD uvd1;
+      PointMatrixXYZ xyz2;
+      PointMatrixUVD uvd2;
+};
 
 }

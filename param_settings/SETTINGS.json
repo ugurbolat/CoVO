@@ -5,14 +5,14 @@
   "initial_pose": [0, 0, 0, 0, 0, 0, 1],
   "initial_timestamp": 0,
   "covo_settings": {
-    "ransac_threshold": 10,
+    "ransac_threshold": 20,
     "depth_near_point_cloud_threshold_in_m": 0.5,
     "depth_far_point_cloud_threshold_in_m": 5,
     "uncertainty_u_in_pixels": 3,
     "uncertainty_v_in_pixels": 3,
     "uncertainty_depth_model": "NGUYEN_QUADRATIC_ONLY",
-    "keyframe_ref_n_feature_threshold": 250,
-    "insufficient_n_feature_threshold": 80,
+    "keyframe_ref_n_feature_threshold": 500,
+    "insufficient_n_feature_threshold": 400,
     "n_skipped_frame": 0
   },
   "ceres_settings": {
