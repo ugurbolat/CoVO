@@ -189,6 +189,7 @@ int read_args(int argc, char** argv,
     console->debug(COVO_SETTINGS->dump(2));
   }
 
+  // adding wait key delay settings to COVO_SETTINGS
   int waitKeySettings;
   if (wait_key_delay)
   {
@@ -204,6 +205,10 @@ int read_args(int argc, char** argv,
   }
   (*COVO_SETTINGS)["wait_key_settings"] = waitKeySettings;
 
+  // adding log level settings to COVO_SETTINGS
+  (*COVO_SETTINGS)["log_level"] = args::get(log_level);
+
+  // getting project related paths
   if (dataset_root_dir)
   {
     console->info("Getting dataset root directory from user");

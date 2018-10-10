@@ -26,6 +26,10 @@ namespace covo
       const std::string getCovoMatcherSettings() const;
       void drawMatches(const std::string&) const;
       bool isSufficientNoMatches() const;
+      PointMatrixXYZ getXyz1() const;
+      PointMatrixUVD getUvd1() const;
+      PointMatrixXYZ getXyz2() const;
+      PointMatrixUVD getUvd2() const;
 
     private:
       cv::Point3f cloudifyUV2XYZ(const cv::Point2f&, const cv::Mat&);
@@ -45,6 +49,6 @@ namespace covo
       PointMatrixUVD uvd1;
       PointMatrixXYZ xyz2;
       PointMatrixUVD uvd2;
-};
+  };
 
 }

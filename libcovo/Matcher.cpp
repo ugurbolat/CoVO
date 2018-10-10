@@ -207,3 +207,25 @@ void covo::Matcher::drawMatches(const std::string& windowTitle="Matches") const
   cv::imshow(windowTitle, imgMatches);
   cv::waitKey(COVO_SETTINGS["wait_key_settings"]);
 }
+
+
+PointMatrixXYZ covo::Matcher::getXyz1() const
+{
+  return xyz1;
+}
+
+PointMatrixUVD covo::Matcher::getUvd1() const
+{
+  return uvd1;
+}
+
+PointMatrixXYZ covo::Matcher::getXyz2() const
+{
+  return xyz2;
+}
+
+PointMatrixUVD covo::Matcher::getUvd2() const
+{
+  return uvd2;
+}
+
