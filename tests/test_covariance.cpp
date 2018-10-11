@@ -76,7 +76,7 @@ int main(int argc, char** argv)
         rgbImgMat2, depthImgMat2, 
         feature1, feature2);
     matcher.findMatches();
-    matcher.drawMatches("Raw Matches");
+    matcher.drawRawMatches();
     matcher.filterOutliers();
 
     if (!matcher.isSufficientNoMatches())

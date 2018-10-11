@@ -1,4 +1,5 @@
-set(libutils_SRCS ReadArgs.cpp ReadArgs.h)
+set(libutils_SRCS 
+  ReadArgs.cpp ReadArgs.h)
 
 #include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
 #conan_basic_setup()

@@ -24,7 +24,12 @@ namespace covo
       void findMatches();
       void filterOutliers();
       const std::string getCovoMatcherSettings() const;
-      void drawMatches(const std::string&) const;
+      void drawRawMatches() const;
+      void drawRawMatches(const std::string&) const;
+      void drawInlierMatches() const;
+      void drawInlierMatches(const std::string&) const;
+      void drawOutlierMatches() const;
+      void drawOutlierMatches(const std::string&) const;
       bool isSufficientNoMatches() const;
       PointMatrixXYZ getXyz1() const;
       PointMatrixUVD getUvd1() const;
@@ -36,14 +41,16 @@ namespace covo
       cv::Point3f convertUV2UVD(const cv::Point2f&, const cv::Mat&);
 
     private:
-      const nlohmann::json COVO_SETTINGS;
+      const nlohmann::json& COVO_SETTINGS;
       const cv::Mat& rgbImg1;
       const cv::Mat& depthImg1;
       const cv::Mat& rgbImg2;
       const cv::Mat& depthImg2;
-      const covo::Feature feature1;
-      const covo::Feature feature2;
+      const covo::Feature& feature1;
+      const covo::Feature& feature2;
       std::vector<cv::DMatch> matches;
+      std::vector<cv::DMatch> inlierMatches;
+      std::vector<cv::DMatch> outlierMatches;
 
       PointMatrixXYZ xyz1;
       PointMatrixUVD uvd1;

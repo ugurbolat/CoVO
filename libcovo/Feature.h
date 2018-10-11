@@ -18,7 +18,7 @@ namespace covo
       bool isSufficientNoKeyPoints() const;
       const cv::Mat getImage() const;
     private:
-      const nlohmann::json COVO_SETTINGS;
+      const nlohmann::json& COVO_SETTINGS;
       const cv::Mat& img;
       std::vector<cv::KeyPoint> keyPoints;
       cv::Mat descriptors;

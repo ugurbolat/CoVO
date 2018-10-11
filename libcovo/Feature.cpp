@@ -19,12 +19,16 @@ covo::Feature::Feature(const json& _COVO_SETTINGS, const cv::Mat& _img) :
 void covo::Feature::detectFeatures()
 {
   if (COVO_SETTINGS["feature_descriptor_choice"] == "ORB")
+  {
     covo::Feature::detectOrbFeatures();
+  }
   // TODO add other feature descriptor type, e.g., FAST, BRIEF...
   else
-    spdlog::get("console")->error("Invalid feature descriptor choice."
+  {
+    spdlog::get("console")->warn("Invalid feature descriptor choice."
         " Default value is set");
-  covo::Feature::detectOrbFeatures();
+    covo::Feature::detectOrbFeatures();
+  }
 }
 
 // TODO add a flag arg to enable/disable drawing
@@ -40,7 +44,7 @@ void covo::Feature::drawFeatureDescriptor()
   }
   else
   {
-    spdlog::get("console")->error("There is no key points to draw!");
+    spdlog::get("console")->warn("There is no key points to draw!");
   }
 }
 
@@ -59,7 +63,7 @@ bool covo::Feature::isSufficientNoKeyPoints() const
   if (keyPoints.size() < 
       COVO_SETTINGS["covo_settings"]["insufficient_n_feature_threshold"])
   {
-    spdlog::get("console")->error("Insufficient no of key points!");
+    spdlog::get("console")->warn("Insufficient no of key points!");
     return false;
   }
   else
@@ -94,15 +98,15 @@ void covo::Feature::detectOrbFeatures()
     else if (COVO_SETTINGS["feature_settings"]["score_type"] == "FAST_SCORE")
       score_type = cv::ORB::FAST_SCORE;
     else
-      spdlog::get("console")->error("Invalid ORB score type in "
+      spdlog::get("console")->warn("Invalid ORB score type in "
           "SETTINGS.json. Default value is set!");
   }
   int patch_size = 31;
   if (COVO_SETTINGS["feature_settings"]["patch_size"] != "DEFAULT")
       patch_size = COVO_SETTINGS["feature_settings"]["patch_size"];
-  int fast_threshold;
+  int fast_threshold = 20;
   if (COVO_SETTINGS["feature_settings"]["fast_threshold"] != "DEFAULT")
-      patch_size = COVO_SETTINGS["feature_settings"]["patch_size"];
+      patch_size = COVO_SETTINGS["feature_settings"]["fast_threshold"];
 
 
   cv::Ptr<cv::Feature2D> orb = cv::ORB::create(
@@ -117,6 +121,7 @@ void covo::Feature::detectOrbFeatures()
       fast_threshold
       );
   orb->detectAndCompute(img, cv::Mat(), keyPoints, descriptors);
+  spdlog::get("console")->debug("No of detected ORB features: {}", keyPoints.size());
 }
 
 const cv::Mat covo::Feature::getImage() const
