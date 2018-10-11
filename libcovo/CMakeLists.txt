@@ -3,6 +3,7 @@ set(libcovo_SRCS
   Matcher.cpp Matcher.h
   Uncertainty.cpp Uncertainty.h
   Optimizer.cpp Optimizer.h
+  KeyframeTracker.cpp KeyframeTracker.h
   CeresEuclideanModel.h)
 
 #include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)

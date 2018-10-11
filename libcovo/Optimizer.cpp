@@ -1,4 +1,5 @@
 #include "Optimizer.h"
+#include <string>
 #include <spdlog/spdlog.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
 #include <nlohmann/json.hpp>
@@ -46,27 +47,52 @@ bool covo::Optimizer::optimize()
   }
 
   ceres::Solver::Options options;
-  options.linear_solver_type = ceres::DENSE_SCHUR;
-  if (COVO_SETTINGS["log_level"] != "warn" && 
+  const std::string& linSolType = COVO_SETTINGS["ceres_settings"]["linear_solver_type"];
+  if (linSolType == "DEFAULT")
+  {
+    options.linear_solver_type = ceres::DENSE_SCHUR;
+  }else if(linSolType == "DENSE_NORMAL_CHOLESKY")
+  {
+    options.linear_solver_type = ceres::DENSE_NORMAL_CHOLESKY;
+  }else if(linSolType == "SPARSE_NORMAL_CHOLESKY")
+  {
+   options.linear_solver_type = ceres::SPARSE_NORMAL_CHOLESKY;
+  }else if(linSolType == "CGNR")
+  {
+   options.linear_solver_type = ceres::CGNR;
+  }else if(linSolType == "DENSE_SCHUR")
+  {
+   options.linear_solver_type = ceres::DENSE_SCHUR;
+  }else if(linSolType == "SPARSE_SCHUR")
+  {
+   options.linear_solver_type = ceres::SPARSE_SCHUR;
+  }else if(linSolType == "ITERATIVE_SCHUR")
+  {
+   options.linear_solver_type = ceres::ITERATIVE_SCHUR;
+  }else
+  {
+   spdlog::get("console")->warn("Invalid linear solver type. Default set to DENSE_SCHUR");
+   options.linear_solver_type = ceres::DENSE_SCHUR;
+  }
+  if (COVO_SETTINGS["log_level"] != "info" &&
+      COVO_SETTINGS["log_level"] != "warn" && 
       COVO_SETTINGS["log_level"] != "error" && 
       COVO_SETTINGS["log_level"] != "critical")
     options.minimizer_progress_to_stdout = true;
   else
     options.minimizer_progress_to_stdout = false;
-  options.max_num_iterations = 10;
+  std::string maxNumIter = COVO_SETTINGS["ceres_settings"]["max_num_iterations"];
+  options.max_num_iterations = std::stoi(std::move(maxNumIter));
+  std::string funcTol = COVO_SETTINGS["ceres_settings"]["function_tolerance"];
+  options.function_tolerance = std::stod(std::move(funcTol));
+  std::string parTol = COVO_SETTINGS["ceres_settings"]["parameter_tolerance"];
+  options.parameter_tolerance = std::stod(std::move(parTol));
+  std::string gradTol = COVO_SETTINGS["ceres_settings"]["gradient_tolerance"];
+  options.gradient_tolerance = std::stod(std::move(gradTol));
   ceres::Solver::Summary summary;
-
-  spdlog::get("console")->info("Optimization started...");
-
   ceres::Solve(options, &problem, &summary);
-//    options.function_tolerance = 1.0e-10;
-//    options.parameter_tolerance = 1.0e-10;
-//    options.gradient_tolerance = 1.0e-10;
-//    ceres::Solver::Summary summary;
-//    ceres::Solve(options, &problem, &summary);
-//    std::cout << summary.FullReport() << "\n";
 
-  // save optimized transformation result
+  // saving optimized transformation result
   transformation[0] = p.data()[0];
   transformation[1] = p.data()[1];
   transformation[2] = p.data()[2];
@@ -74,6 +100,10 @@ bool covo::Optimizer::optimize()
   transformation[4] = q.vec()[1];
   transformation[5] = q.vec()[2];
   transformation[6] = q.w();
+
+  // saving p,q
+  translation = std::move(p);
+  rotation = std::move(q);
 
   spdlog::get("console")->info("Optimized Transformation: \n"
       "{0} {1} {2} {3} {4} {5} {6}", 
@@ -88,7 +118,17 @@ bool covo::Optimizer::optimize()
 
   // calc covariance
   ceres::Covariance::Options cov_options;
-  cov_options.algorithm_type = ceres::DENSE_SVD;
+  const std::string& covType = COVO_SETTINGS["ceres_settings"]["covariance_algorithm_type"];
+  if (covType == "DEFAULT")
+  {
+    cov_options.algorithm_type = ceres::SPARSE_QR;
+  }else if (covType == "SPARSE_QR")
+  {
+    cov_options.algorithm_type = ceres::SPARSE_QR;
+  }else if (covType == "DENSE_SVD")
+  {
+    cov_options.algorithm_type = ceres::DENSE_SVD;
+  }
   ceres::Covariance ceresCov(cov_options);
 
   std::vector<std::pair<const double*, const double*>> covBlocks;
@@ -147,6 +187,16 @@ bool covo::Optimizer::optimize()
       "","","","",covariance_qq[4], covariance_qq[5],
       "","","","","",covariance_qq[8]
       );
+  if (summary.termination_type == ceres::CONVERGENCE)
+  {
+    spdlog::get("console")->info("Optimization is converged");
+    return true;
+  }
+  else
+  {
+    spdlog::get("console")->error("Optimization is NOT converged!");
+    return false;
+  }
 }
 
 
@@ -158,4 +208,14 @@ std::array<double, 7> covo::Optimizer::getTransformation() const
 std::array<double, 21> covo::Optimizer::getCovariance() const
 {
   return covariance;
+}
+
+Eigen::Vector3d covo::Optimizer::getTranslation() const
+{
+  return translation;
+}
+
+Eigen::Quaterniond covo::Optimizer::getRotation() const
+{
+  return rotation;
 }

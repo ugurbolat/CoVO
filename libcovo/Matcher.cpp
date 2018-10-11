@@ -48,8 +48,8 @@ void covo::Matcher::filterOutliers()
 {
   cv::Mat inlierMask, homography;
   //std::vector<cv::KeyPoint> inliers1, inliers2;
-  std::vector<cv::DMatch> inlierMatches;
-  std::vector<cv::DMatch> outlierMatches;
+  //std::vector<cv::DMatch> inlierMatches;
+  //std::vector<cv::DMatch> outlierMatches;
 
 
   std::vector<cv::Point2f> pixelPoint1, pixelPoint2;
@@ -67,6 +67,7 @@ void covo::Matcher::filterOutliers()
         inlierMask);
   else
     spdlog::get("console")->error("Cannot apply RANSAC due to insufficient no of matches!");
+
   if (!homography.empty())
   {
     // filter outliers
@@ -74,9 +75,8 @@ void covo::Matcher::filterOutliers()
     {
       if (inlierMask.at<uchar>(i))
       {
-        inlierMatches.push_back(std::move(matches[i]));
-        const cv::Point2f& uv1 = feature1.getKeyPoints()[matches[i].queryIdx].pt;
-        const cv::Point2f& uv2 = feature2.getKeyPoints()[matches[i].trainIdx].pt;
+        cv::Point2f uv1 = feature1.getKeyPoints()[matches[i].queryIdx].pt;
+        cv::Point2f uv2 = feature2.getKeyPoints()[matches[i].trainIdx].pt;
         cv::Point3f pointXyz1 = covo::Matcher::cloudifyUV2XYZ(uv1, depthImg1);
         cv::Point3f pointXyz2 = covo::Matcher::cloudifyUV2XYZ(uv2, depthImg2);
         if (pointXyz1.z < COVO_SETTINGS["covo_settings"]["depth_near_point_cloud_threshold_in_m"] || 
@@ -88,15 +88,22 @@ void covo::Matcher::filterOutliers()
         }
         else
         {
-          xyz1.push_back(pointXyz1);
-          xyz2.push_back(pointXyz2);
-          uvd1.push_back(covo::Matcher::convertUV2UVD(uv1, depthImg1));
-          uvd2.push_back(covo::Matcher::convertUV2UVD(uv2, depthImg2));
-          spdlog::get("console")->trace("Good point clouds 1: {}, {}, {}", 
+          spdlog::get("console")->trace("XYZ 1: {}, {}, {}", 
               pointXyz1.x, pointXyz1.y, pointXyz1.z);
-          spdlog::get("console")->trace("Good point clouds 2: {}, {}, {}", 
+          spdlog::get("console")->trace("XYZ 2: {}, {}, {}", 
               pointXyz2.x, pointXyz2.y, pointXyz2.z);
+          xyz1.push_back(std::move(pointXyz1));
+          xyz2.push_back(std::move(pointXyz2));
+          cv::Point3f pointUvd1 = covo::Matcher::convertUV2UVD(uv1, depthImg1);
+          cv::Point3f pointUvd2 = covo::Matcher::convertUV2UVD(uv2, depthImg2);
+          spdlog::get("console")->trace("UVD 1: {}, {}, {}", 
+              pointUvd1.x, pointUvd1.y, pointUvd1.z);
+          spdlog::get("console")->trace("UVD 2: {}, {}, {}", 
+              pointUvd2.x, pointUvd2.y, pointUvd2.z);
+          uvd1.push_back(std::move(pointUvd1));
+          uvd2.push_back(std::move(pointUvd2));
         }
+        inlierMatches.push_back(std::move(matches[i]));
       }
       else
       {
@@ -108,29 +115,9 @@ void covo::Matcher::filterOutliers()
   }
   else
     spdlog::get("console")->error("Homography mask is empty!");
-
-  cv::Mat imgMatches;
-  cv::drawMatches(
-      feature1.getImage(), feature1.getKeyPoints(),
-      feature2.getImage(), feature2.getKeyPoints(),
-      inlierMatches,
-      imgMatches
-      );
-  cv::imshow("Inlier Matches", imgMatches);
-  cv::waitKey(COVO_SETTINGS["wait_key_settings"]);
-
-  cv::Mat imgMatches_;
-  cv::drawMatches(
-      feature1.getImage(), feature1.getKeyPoints(),
-      feature2.getImage(), feature2.getKeyPoints(),
-      outlierMatches,
-      imgMatches_
-      );
-  cv::imshow("Outlier Matches", imgMatches_);
-  cv::waitKey(COVO_SETTINGS["wait_key_settings"]);
-
-
 }
+
+
 
 cv::Point3f covo::Matcher::cloudifyUV2XYZ(const cv::Point2f& pix, const cv::Mat& depthImg)
 {
@@ -141,7 +128,6 @@ cv::Point3f covo::Matcher::cloudifyUV2XYZ(const cv::Point2f& pix, const cv::Mat&
   auto& scale = COVO_SETTINGS["camera_settings"]["scale"];
 
   float d = depthImg.at<ushort>(ushort(pix.x), ushort(pix.y)) / float(scale) ;
-  //spdlog::get("console")->trace("depth {}", depthImg.at<ushort>(ushort(pix.x), ushort(pix.y)));
   cv::Point3f p;
   p.x = (pix.x - float(cx)) * d / float(fx);
   p.y = (pix.y - float(cy)) * d / float(fy);
@@ -155,7 +141,7 @@ cv::Point3f covo::Matcher::convertUV2UVD(const cv::Point2f& pix, const cv::Mat& 
   auto& scale = COVO_SETTINGS["camera_settings"]["scale"];
   float d = depthImg.at<ushort>(ushort(pix.x), ushort(pix.y)) / float(scale) ;
   //TODO what's up with this warning?
-  cv::Point3f p(p.x, p.y, d);
+  cv::Point3f p(pix.x, pix.y, d);
   return p;
 }
 
@@ -164,7 +150,7 @@ bool covo::Matcher::isSufficientNoMatches() const
   if (xyz1.size() < 
       COVO_SETTINGS["covo_settings"]["insufficient_n_feature_threshold"])
   {
-    spdlog::get("console")->error("Insufficient no of key points!");
+    spdlog::get("console")->warn("Insufficient no of key points!");
     return false;
   }
   else
@@ -188,14 +174,13 @@ const std::string covo::Matcher::getCovoMatcherSettings() const
     return "BruteForce-Sl2";
   else
   {
-    spdlog::get("console")->error("Invalid matcher settings type! "
+    spdlog::get("console")->warn("Invalid matcher settings type! "
         "Default set to BruteForce.");
     return "BruteForce";
   }
 }
 
-
-void covo::Matcher::drawMatches(const std::string& windowTitle="Matches") const
+void covo::Matcher::drawRawMatches() const
 {
   cv::Mat imgMatches;
   cv::drawMatches(
@@ -204,7 +189,72 @@ void covo::Matcher::drawMatches(const std::string& windowTitle="Matches") const
       matches,
       imgMatches
       );
-  cv::imshow(windowTitle, imgMatches);
+  cv::imshow("Raw Matches", imgMatches);
+  cv::waitKey(COVO_SETTINGS["wait_key_settings"]);
+}
+
+void covo::Matcher::drawRawMatches(const std::string& title) const
+{
+  cv::Mat imgMatches;
+  cv::drawMatches(
+      feature1.getImage(), feature1.getKeyPoints(),
+      feature2.getImage(), feature2.getKeyPoints(),
+      matches,
+      imgMatches
+      );
+  cv::imshow(title, imgMatches);
+  cv::waitKey(COVO_SETTINGS["wait_key_settings"]);
+}
+
+void covo::Matcher::drawInlierMatches() const
+{
+  cv::Mat imgMatches;
+  cv::drawMatches(
+      feature1.getImage(), feature1.getKeyPoints(),
+      feature2.getImage(), feature2.getKeyPoints(),
+      inlierMatches,
+      imgMatches
+      );
+  cv::imshow("Inlier Matches", imgMatches);
+  cv::waitKey(COVO_SETTINGS["wait_key_settings"]);
+}
+
+void covo::Matcher::drawInlierMatches(const std::string& title) const
+{
+  cv::Mat imgMatches;
+  cv::drawMatches(
+      feature1.getImage(), feature1.getKeyPoints(),
+      feature2.getImage(), feature2.getKeyPoints(),
+      inlierMatches,
+      imgMatches
+      );
+  cv::imshow(title, imgMatches);
+  cv::waitKey(COVO_SETTINGS["wait_key_settings"]);
+}
+
+void covo::Matcher::drawOutlierMatches() const
+{
+  cv::Mat imgMatches;
+  cv::drawMatches(
+      feature1.getImage(), feature1.getKeyPoints(),
+      feature2.getImage(), feature2.getKeyPoints(),
+      outlierMatches,
+      imgMatches
+      );
+  cv::imshow("Outlier Matches", imgMatches);
+  cv::waitKey(COVO_SETTINGS["wait_key_settings"]);
+}
+
+void covo::Matcher::drawOutlierMatches(const std::string& title) const
+{
+  cv::Mat imgMatches;
+  cv::drawMatches(
+      feature1.getImage(), feature1.getKeyPoints(),
+      feature2.getImage(), feature2.getKeyPoints(),
+      outlierMatches,
+      imgMatches
+      );
+  cv::imshow(title, imgMatches);
   cv::waitKey(COVO_SETTINGS["wait_key_settings"]);
 }
 
