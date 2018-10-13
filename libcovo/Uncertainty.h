@@ -25,7 +25,7 @@ namespace covo
     private:
       void calculateCovariance();
       void calculateNguyenQuadraticOnly(const PointMatrixUVD&, const PointMatrixUVD&);
-
+      std::string exec(std::string);
 
     private:
       const nlohmann::json& COVO_SETTINGS;

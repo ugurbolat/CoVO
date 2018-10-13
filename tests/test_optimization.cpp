@@ -8,6 +8,7 @@
 #include <args.hxx>
 #include <spdlog/spdlog.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
+#include <fstream>
 
 #include <opencv2/core.hpp>
 #include <opencv2/imgcodecs.hpp>
@@ -43,10 +44,18 @@ int main(int argc, char** argv)
   Eigen::Quaterniond initQ(1, 0, 0, 0);
   keyframeTracker.setPreviousTransformation(initP, initQ);
 
+  // output file for relative transformation results
+  std::ofstream ofRelTrans("./covo_rel_trans.txt", std::ios_base::trunc);
+  ofRelTrans.setf(std::ios_base::fixed);
+  if (ofRelTrans.fail())
+  {
+    spdlog::get("console")->error("Cannot open covo_rel_trans.txt to write!");
+  }
+
   // Extracting features from RGB images
   spdlog::get("console")->info("Reading rgb&depth images from dataset...");
   int kfIdx = 0;
-  for (int i = 0; i < 500; i++)
+  for (int i = 0; i < 700; i++)
   {
     // read and extract features from img 1
     cv::String rgbImg1(rgbdImgFiles.at(kfIdx)[0]);
@@ -107,7 +116,15 @@ int main(int argc, char** argv)
     // saving current transformation result to keyframe tracker
     keyframeTracker.setCurrentTransformation(currentP, currentQ);
     // now getting relative transformation btw prev and current transformation
+    keyframeTracker.calculateRelativeTransformation();
     std::array<double, 7> relTrans = keyframeTracker.getRelativeTransformation();
+    // write out the results
+    ofRelTrans << std::setprecision(6) << rgbdImgTimestamps.at(i+1)[0] << " ";
+    for (auto res : relTrans)
+    {
+      ofRelTrans << res << " ";
+    }
+    ofRelTrans << "\n";
 
     // preparing keyframe tracker for the next iter
     keyframeTracker.setPreviousTransformation(currentP, currentQ);
@@ -121,6 +138,8 @@ int main(int argc, char** argv)
       keyframeTracker.setPreviousTransformation(initP, initQ);
     }
   }
+
+  ofRelTrans.close();
 
   return 1;
 }
