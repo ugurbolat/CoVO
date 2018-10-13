@@ -127,7 +127,7 @@ cv::Point3f covo::Matcher::cloudifyUV2XYZ(const cv::Point2f& pix, const cv::Mat&
   auto& cy = COVO_SETTINGS["camera_settings"]["cy"];
   auto& scale = COVO_SETTINGS["camera_settings"]["scale"];
 
-  float d = depthImg.at<ushort>(ushort(pix.x), ushort(pix.y)) / float(scale) ;
+  float d = depthImg.at<ushort>(cvRound(pix.y), cvRound(pix.x)) / float(scale) ;
   cv::Point3f p;
   p.x = (pix.x - float(cx)) * d / float(fx);
   p.y = (pix.y - float(cy)) * d / float(fy);
@@ -139,7 +139,7 @@ cv::Point3f covo::Matcher::cloudifyUV2XYZ(const cv::Point2f& pix, const cv::Mat&
 cv::Point3f covo::Matcher::convertUV2UVD(const cv::Point2f& pix, const cv::Mat& depthImg)
 {
   auto& scale = COVO_SETTINGS["camera_settings"]["scale"];
-  float d = depthImg.at<ushort>(ushort(pix.x), ushort(pix.y)) / float(scale) ;
+  float d = depthImg.at<ushort>(cvRound(pix.y), cvRound(pix.x)) / float(scale) ;
   //TODO what's up with this warning?
   cv::Point3f p(pix.x, pix.y, d);
   return p;

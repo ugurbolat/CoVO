@@ -188,6 +188,7 @@ int read_args(int argc, char** argv,
     ifSettings >> *COVO_SETTINGS;
     console->debug(COVO_SETTINGS->dump(2));
   }
+  ifSettings.close();
 
   // adding wait key delay settings to COVO_SETTINGS
   int waitKeySettings;
@@ -254,6 +255,7 @@ int read_args(int argc, char** argv,
     rgbdImgTimestamp[1] = std::stod(rgbImgTimestamp);
     rgbdImgTimestamps->push_back(std::move(rgbdImgTimestamp));
    }
+  ifAssociation.close();
 
   return 1;
 

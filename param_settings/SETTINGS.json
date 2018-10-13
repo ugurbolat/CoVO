@@ -6,11 +6,11 @@
   "initial_timestamp": 0,
   "covo_settings":
   {
-    "ransac_threshold": 20,
+    "ransac_threshold": 10,
     "depth_near_point_cloud_threshold_in_m": 0.5,
     "depth_far_point_cloud_threshold_in_m": 5,
-    "uncertainty_u_in_pixels": 3,
-    "uncertainty_v_in_pixels": 3,
+    "uncertainty_u_in_pixels": 10,
+    "uncertainty_v_in_pixels": 10,
     "uncertainty_depth_model": "NGUYEN_QUADRATIC_ONLY",
     "keyframe_ref_n_feature_threshold": 300,
     "insufficient_n_feature_threshold": 150,
@@ -20,9 +20,9 @@
   {
     "linear_solver_type": "DENSE_SCHUR",
     "max_num_iterations": "10",
-    "function_tolerance": "1.0e-6",
-    "parameter_tolerance": "1.0e-6",
-    "gradient_tolerance": "1.0e-6",
+    "function_tolerance": "1.0e-10",
+    "parameter_tolerance": "1.0e-10",
+    "gradient_tolerance": "1.0e-10",
     "covariance_algorithm_type": "SPARSE_QR"
   },
   "camera_settings":
