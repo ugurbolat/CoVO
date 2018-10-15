@@ -15,6 +15,8 @@ namespace covo
       void setCurrentTransformation(Eigen::Vector3d, Eigen::Quaterniond);
       std::array<double, 7> getRelativeTransformation() const; 
       void calculateRelativeTransformation();
+      Eigen::Vector3d getTranslation() const;
+      Eigen::Quaterniond getRotation() const;
 
     private:
      Eigen::Vector3d prevP;
@@ -22,6 +24,8 @@ namespace covo
      Eigen::Vector3d currentP;
      Eigen::Quaterniond currentQ;
      std::array<double, 7> relTrans;
+     Eigen::Vector3d translation;
+     Eigen::Quaterniond rotation;
 
   };
 }

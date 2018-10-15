@@ -7,8 +7,8 @@ covo::KeyframeTracker::KeyframeTracker() {}
 
 void covo::KeyframeTracker::calculateRelativeTransformation()
 {
-  Eigen::Vector3d translation = prevQ.conjugate() * (currentP - prevP);
-  Eigen::Quaterniond rotation = prevQ.conjugate() * currentQ;
+  translation = prevQ.conjugate() * (currentP - prevP);
+  rotation = prevQ.conjugate() * currentQ;
   std::array<double, 7> transformation;
   relTrans[0] = translation[0];
   relTrans[1] = translation[1];
@@ -43,4 +43,14 @@ void covo::KeyframeTracker::setCurrentTransformation(Eigen::Vector3d p, Eigen::Q
 std::array<double, 7> covo::KeyframeTracker::getRelativeTransformation() const
 {
   return relTrans;
+}
+
+Eigen::Vector3d covo::KeyframeTracker::getTranslation() const
+{
+  return translation;
+}
+
+Eigen::Quaterniond covo::KeyframeTracker::getRotation() const
+{
+  return rotation;
 }
