@@ -47,32 +47,49 @@ int read_args(int argc, char** argv,
     std::vector<std::array<std::string, 2>>* rgbdImgFiles,
     std::vector<std::array<double, 2>>* rgbdImgTimestamps) {
 
-  
-
-  args::ArgumentParser parser("This reads <covo_settings.json> files,");
+  args::ArgumentParser parser("Welcome to CoVO!"
+      "\nCoVO is an Error-Aware RGB-D Visual Odometry Tool"
+      "\nFor more information visit https://github.com/ugurbolat/CoVO");
   args::HelpFlag help(parser, "help", "Display help menu", {'h', "help"});
   args::ValueFlag<std::string> settings_file(parser,
       "/path/to/SETTINGS.json",
       "JSON settings file to read. "
       "\nDefault SETTINGS.json located in params_settings folder",
-      {'s', "settings_file"});
+      {'s', "settings"});
   args::ValueFlag<std::string> dataset_root_dir(parser,
       "/path/to/dataset_dir",
       "Raw dataset root directory."
       "\nDefault dataset located in docs folder",
-      {'d', "dataset_root_dir"});
+      {'d', "dataset_dir"});
   args::ValueFlag<std::string> log_level(parser,
       "trace, debug, info, warn, error, critical",
       "Log level settings. \nDefault is at info level",
       {'l', "log_level"});
+  args::ValueFlag<std::string> output_dir(parser,
+      "/path/to/output_dir/",
+      "Output directory in which CoVO results will be saved"
+      "\nDefault is './'",
+      {'o', "output_dir"});
+  args::ValueFlag<std::string> no_img_pairs_to_process(parser,
+      "1,2,...,all",
+      "No of image pairs to be processed. An integer or all can be entered"
+      "\nDefault is all",
+      {'i',"no_imgs"});
+  args::Flag draw_matches(parser,
+      "draw-matches",
+      "Enable flag for drawing matches"
+      "\nDefault is disabled",
+      {"draw-matches"});
   args::ValueFlag<int> wait_key_delay(parser, "delay in ms",
       "Delay btw image readings. "
-      "\nDefault is 0 (it will wait indefinitely for key press",
+      "This functionality is only available if draw_matches is enabled"
+      "\nDefault is 0 which means it will wait indefinitely for key press",
       {'t', "time_delay"});
-  args::ValueFlag<std::string> project_root_folder(parser, 
-      "/path/to/project/root/folder/", 
-      "The root of folder COVO project", 
-      {'p', "project_path"});
+  args::Flag trajectory(parser,
+      "trajectory",
+      "Concatenate relative transformations to track camere poses"
+      "\n Default is disabled",
+      {"trajectory"});
 
   // parsing args
   try
@@ -133,34 +150,21 @@ int read_args(int argc, char** argv,
   std::string settingsFilePath;
   std::string datasetRootFolder;
 
-  if (project_root_folder)
+  std::string binPath = getCurrentWorkingDir();
+  std::size_t found = binPath.find("covo");
+  if (found != std::string::npos)
   {
-    projectRootFolder = args::get(project_root_folder);
-    if (projectRootFolder.back() != '/')
-      projectRootFolder += '/';
-    settingsFilePath = projectRootFolder + "param_settings/SETTINGS.json";
-    datasetRootFolder = projectRootFolder + "docs/sample_dataset/";
-    console->info("Getting project root folder path from user");
+    console->info("Your project root folder found automatically: " + binPath.substr(0, found+5));
   }
   else
   {
-    std::string binPath = getCurrentWorkingDir();
-    std::cout << binPath << std::endl;
-    std::size_t found = binPath.find("covo");
-    if (found != std::string::npos)
-    {
-      console->info("Your project root folder found automatically: " + binPath.substr(0, found+9));
-    }
-    else
-    {
-      console->error("Could not find your project root folder. " 
-          "Please, provide as a argument");
-    }
-
-    projectRootFolder = binPath.substr(0, found+5);
-    settingsFilePath = projectRootFolder + "param_settings/SETTINGS.json";
-    datasetRootFolder = projectRootFolder + "docs/sample_dataset/";
+    console->error("Could not find your project root folder. "
+        "Sample dataset and SETTINGS.json will not work properly");
   }
+
+  projectRootFolder = binPath.substr(0, found+5);
+  settingsFilePath = projectRootFolder + "param_settings/SETTINGS.json";
+  datasetRootFolder = projectRootFolder + "docs/sample_dataset/";
 
   std::ifstream ifSettings;
   if (settings_file)  // getting settings.json from user
@@ -181,7 +185,7 @@ int read_args(int argc, char** argv,
     ifSettings.open(settingsFilePath);
     if (ifSettings.fail())
     {
-      console->critical("Cannot read the default settings file located in " + 
+      console->critical("Cannot read the default settings file located in " +
           settingsFilePath);
       return 0;
     }
@@ -219,6 +223,71 @@ int read_args(int argc, char** argv,
   {
     console->info("Getting default dataset root directory");
   }
+
+  // adding draw-matches enabled settings to COVO_SETTINGS
+  if (draw_matches)
+  {
+    console->info("Enabling draw-matches");
+    (*COVO_SETTINGS)["draw_matches"] = true;
+  }
+  else
+  {
+    console->info("Disabling draw-matches");
+    (*COVO_SETTINGS)["draw_matches"] = false;
+  }
+
+  if (trajectory)
+  {
+    console->info("Enabling trajectory calculation");
+    (*COVO_SETTINGS)["trajectory"] = true;
+  }
+  else
+  {
+    console->info("Disabling trajectory calculation");
+    (*COVO_SETTINGS)["trajectory"] = false;
+  }
+
+  // adding output_dir to COVO_SETTINGS
+  std::string outputDir;
+  if (output_dir)
+  {
+    console->info("Getting output directory from user");
+    if (args::get(output_dir).back() != '/')
+    {
+      outputDir = args::get(output_dir) + '/';
+    }
+    else
+    {
+      outputDir = args::get(output_dir);
+    }
+  }
+  else
+  {
+    console->info("Getting default output directory");
+    outputDir = "./";
+  }
+  (*COVO_SETTINGS)["output_dir"] = outputDir;
+
+  // adding no of imgs to process to COVO_SETTINGS
+  int noImg;
+  if (no_img_pairs_to_process)
+  {
+    console->info("Getting no of img pairs to process from user");
+    if (args::get(no_img_pairs_to_process) == "all")
+    {
+      noImg = -1;
+    }
+    else
+    {
+      noImg = std::stoi(args::get(no_img_pairs_to_process));
+    }
+  }
+  else
+  {
+    console->info("Getting default no if img pairs to process");
+    noImg = -1; // all option
+  }
+  (*COVO_SETTINGS)["no_img_pairs_to_process"] = noImg;
 
   std::string associationsFile;
 
