@@ -41,12 +41,17 @@ sudo apt-get install x264 v4l-utils
 git clone https://github.com/opencv/opencv.git
 cd opencv 
 git checkout 3.3.1 
-cd ..
+cd ../
 git clone https://github.com/opencv/opencv.git
 cd opencv 
 git checkout 3.3.1 
-cd ..
-cmake -D CMAKE_BUILD_TYPE=RELEASE       -D WITH_TBB=ON       -D WITH_V4L=ON       -D WITH_QT=ON       -D WITH_OPENGL=ON       -D OPENCV_EXTRA_MODULES_PATH=../../opencv_contrib/modules ..
+cd ../
+cmake -D CMAKE_BUILD_TYPE=RELEASE \
+      -D WITH_TBB=ON \
+      -D WITH_V4L=ON \
+      -D WITH_QT=ON \
+      -D WITH_OPENGL=ON \
+      -D OPENCV_EXTRA_MODULES_PATH=../../opencv_contrib/modules \ ..
 make -j8
 sudo checkinstall
 ```
