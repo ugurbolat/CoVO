@@ -2,7 +2,7 @@
 #include "Feature.h"
 #include "Matcher.h"
 #include <nlohmann/json.hpp>
-#include <args.hxx>
+#include <arg/args.hxx>
 #include <spdlog/spdlog.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
 
