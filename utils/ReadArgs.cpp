@@ -13,7 +13,7 @@
 #include <string>
 #include <fstream>
 #include <nlohmann/json.hpp>
-#include <args.hxx>
+#include <arg/args.hxx>
 #include <spdlog/spdlog.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
 
@@ -151,7 +151,7 @@ int read_args(int argc, char** argv,
   std::string datasetRootFolder;
 
   std::string binPath = getCurrentWorkingDir();
-  std::size_t found = binPath.find("covo");
+  std::size_t found = binPath.find("CoVO");
   if (found != std::string::npos)
   {
     console->info("Your project root folder found automatically: " + binPath.substr(0, found+5));
