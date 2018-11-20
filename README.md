@@ -1,3 +1,6 @@
+![Alt Text](docs/feature_matchings.gif)
+
+
 # Installation 
 
 ## Standalone
