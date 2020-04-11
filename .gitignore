@@ -20,6 +20,3 @@ tags
 
 # Project related
 build/*
-docs/sample_dataset/rgb/*
-docs/sample_dataset/depth/*
-
