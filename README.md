@@ -1,3 +1,17 @@
+# What?
+
+**CoVO** is a Visual Odometry tool that uses RGB-D images to estimate the *relative pose* (position and orientation) of a camera and the *covariances* of pose estimation.
+
+# Why?
+
+**CoVO** was built because there was no Visual Odometry tool that can provide *uncertainty* of pose estimations.
+
+# How?
+
+**CoVO** uses sensor noise models of the camera to propagate the measurement errors (epistemic uncertainty) to estimate covariances.
+
+
+
 ![Alt Text](docs/feature_matchings.gif)
 
 
