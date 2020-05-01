@@ -60,7 +60,7 @@ int main(int argc, char** argv)
   {
     spdlog::get("console")->error("Cannot open covo_rel_cov.txt to write!");
   }
-  // TODO fill the formating
+  // #TODO fill the formating
   ofRelCov << "# CoVO Relative Covariance Results. Only upper triangluar matrix is given\n";
 
   std::ofstream ofTrajTrans(ssOutputDir.str() + "covo_trajectory.txt", std::ios_base::trunc);
@@ -93,7 +93,7 @@ int main(int argc, char** argv)
     << trajectoryQ.vec()[2] << " "
     << trajectoryQ.w() << "\n";
 
-  // Loop related stuff
+  // Instantiating loop related variables
   int noImgPairsToProcess;
   if (COVO_SETTINGS["no_img_pairs_to_process"] == -1)
   {
@@ -104,6 +104,8 @@ int main(int argc, char** argv)
     noImgPairsToProcess = COVO_SETTINGS["no_img_pairs_to_process"];
   }
   int kfIdx = 0;
+
+  
   for (int i = 0; i < noImgPairsToProcess-1; i++)
   {
     // read and extract features from img 1
@@ -168,7 +170,7 @@ int main(int argc, char** argv)
     keyframeTracker.calculateRelativeTransformation();
     std::array<double, 7> relTrans = keyframeTracker.getRelativeTransformation();
 
-    // write out the results
+    // write out the results to txt files
     ofRelTrans << std::setprecision(6) << rgbdImgTimestamps.at(i+1)[0] << " ";
     for (auto res : relTrans)
     {
@@ -182,26 +184,27 @@ int main(int argc, char** argv)
       ofRelCov << res << " ";
     }
     ofRelCov << "\n";
-
+    
     trajectoryP = trajectoryP + trajectoryQ * keyframeTracker.getTranslation();
     trajectoryQ = trajectoryQ * keyframeTracker.getRotation();
     ofTrajTrans << std::setprecision(6) << rgbdImgTimestamps.at(i+1)[0] << " ";
     ofTrajTrans
-      << trajectoryP[0] << " "
-      << trajectoryP[1] << " "
-      << trajectoryP[2] << " "
-      << trajectoryQ.vec()[0] << " "
-      << trajectoryQ.vec()[1] << " "
-      << trajectoryQ.vec()[2] << " "
-      << trajectoryQ.w() << "\n";
+    << trajectoryP[0] << " "
+    << trajectoryP[1] << " "
+    << trajectoryP[2] << " "
+    << trajectoryQ.vec()[0] << " "
+    << trajectoryQ.vec()[1] << " "
+    << trajectoryQ.vec()[2] << " "
+    << trajectoryQ.w() << "\n";
+    
 
     // preparing keyframe tracker for the next iter
     keyframeTracker.setPreviousTransformation(currentP, currentQ);
 
-    // check for sufficient matching
+    // check if there are sufficient matchings
     if (!matcher.isSufficientNoMatches())
     {
-      // TODO you might want to do matching again with updated keyframe?
+      // #TODO you might want to do matching again with updated keyframe?
       spdlog::get("console")->warn("Insufficient no of matches. Changing ref keyframe!");
       kfIdx = i;
       keyframeTracker.setPreviousTransformation(initP, initQ);

@@ -48,17 +48,17 @@ int read_args(int argc, char** argv,
     std::vector<std::array<double, 2>>* rgbdImgTimestamps) {
 
   args::ArgumentParser parser("Welcome to CoVO!"
-      "\nCoVO is an Error-Aware RGB-D Visual Odometry Tool"
+      "\nCoVO is an Uncertainty-Aware RGB-D Visual Odometry Tool"
       "\nFor more information visit https://github.com/ugurbolat/CoVO");
   args::HelpFlag help(parser, "help", "Display help menu", {'h', "help"});
   args::ValueFlag<std::string> settings_file(parser,
       "/path/to/SETTINGS.json",
-      "JSON settings file to read. "
+      "Configuration file of CoVO's settings; e.g., camera intrinsics, sensor noise model etc."
       "\nDefault SETTINGS.json located in params_settings folder",
       {'s', "settings"});
   args::ValueFlag<std::string> dataset_root_dir(parser,
       "/path/to/dataset_dir",
-      "Raw dataset root directory."
+      "Dataset root directory."
       "\nDefault dataset located in docs folder",
       {'d', "dataset_dir"});
   args::ValueFlag<std::string> log_level(parser,
@@ -77,19 +77,14 @@ int read_args(int argc, char** argv,
       {'i',"no_imgs"});
   args::Flag draw_matches(parser,
       "draw-matches",
-      "Enable flag for drawing matches"
+      "Enable flag for drawing matches on image pairs"
       "\nDefault is disabled",
       {"draw-matches"});
   args::ValueFlag<int> wait_key_delay(parser, "delay in ms",
       "Delay btw image readings. "
       "This functionality is only available if draw_matches is enabled"
-      "\nDefault is 0 which means it will wait indefinitely for key press",
+      "\nDefault is 0 which means it will wait indefinitely for key press to process next image pairs",
       {'t', "time_delay"});
-  args::Flag trajectory(parser,
-      "trajectory",
-      "Concatenate relative transformations to track camere poses"
-      "\n Default is disabled",
-      {"trajectory"});
 
   // parsing args
   try
@@ -234,17 +229,6 @@ int read_args(int argc, char** argv,
   {
     console->info("Disabling draw-matches");
     (*COVO_SETTINGS)["draw_matches"] = false;
-  }
-
-  if (trajectory)
-  {
-    console->info("Enabling trajectory calculation");
-    (*COVO_SETTINGS)["trajectory"] = true;
-  }
-  else
-  {
-    console->info("Disabling trajectory calculation");
-    (*COVO_SETTINGS)["trajectory"] = false;
   }
 
   // adding output_dir to COVO_SETTINGS

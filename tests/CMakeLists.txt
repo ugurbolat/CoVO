@@ -47,3 +47,10 @@ target_link_libraries(test_optimization
   utils
   ceres)
 
+set_target_properties(test_read_args 
+  test_feature_extraction 
+  test_feature_matching 
+  test_covariance 
+  test_optimization 
+  PROPERTIES 
+  RUNTIME_OUTPUT_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/test)
