@@ -182,20 +182,18 @@ int main(int argc, char** argv)
       ofRelCov << res << " ";
     }
     ofRelCov << "\n";
-    if (COVO_SETTINGS["trajectory"])
-    {
-      trajectoryP = trajectoryP + trajectoryQ * keyframeTracker.getTranslation();
-      trajectoryQ = trajectoryQ * keyframeTracker.getRotation();
-      ofTrajTrans << std::setprecision(6) << rgbdImgTimestamps.at(i+1)[0] << " ";
-      ofTrajTrans
-        << trajectoryP[0] << " "
-        << trajectoryP[1] << " "
-        << trajectoryP[2] << " "
-        << trajectoryQ.vec()[0] << " "
-        << trajectoryQ.vec()[1] << " "
-        << trajectoryQ.vec()[2] << " "
-        << trajectoryQ.w() << "\n";
-    }
+
+    trajectoryP = trajectoryP + trajectoryQ * keyframeTracker.getTranslation();
+    trajectoryQ = trajectoryQ * keyframeTracker.getRotation();
+    ofTrajTrans << std::setprecision(6) << rgbdImgTimestamps.at(i+1)[0] << " ";
+    ofTrajTrans
+      << trajectoryP[0] << " "
+      << trajectoryP[1] << " "
+      << trajectoryP[2] << " "
+      << trajectoryQ.vec()[0] << " "
+      << trajectoryQ.vec()[1] << " "
+      << trajectoryQ.vec()[2] << " "
+      << trajectoryQ.w() << "\n";
 
     // preparing keyframe tracker for the next iter
     keyframeTracker.setPreviousTransformation(currentP, currentQ);

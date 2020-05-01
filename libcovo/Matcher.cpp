@@ -5,7 +5,6 @@
 #include <spdlog/sinks/stdout_color_sinks.h>
 #include <nlohmann/json.hpp>
 #include <opencv2/opencv.hpp>
-#include "opencv2/xfeatures2d.hpp"
 #include "opencv2/features2d.hpp"
 
 using json = nlohmann::json;

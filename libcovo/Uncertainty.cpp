@@ -112,40 +112,8 @@ void covo::Uncertainty::calculateNguyenQuadraticOnly(const PointMatrixUVD& uvd1,
 //        lltSqrtInfo2(1,0), lltSqrtInfo2(1,1), lltSqrtInfo2(1,2),
 //        lltSqrtInfo2(2,0), lltSqrtInfo2(2,1), lltSqrtInfo2(2,2));
 //    sumSqrtInformations.push_back((lltSqrtInfo1 + lltSqrtInfo2)/2);
-
-//    // calling python tested script to validate sqrting
-//    std::ostringstream cmd;
-//    cmd <<
-//      "/home/majgull/dev/thesis/testbenches/covo_covariance/venv/bin/python "
-//      "/home/majgull/dev/thesis/testbenches/covo_covariance/cov.py "
-//      "517.3 516.5 318.6 255.3 10 10 " <<
-//      uvd1[i].x << " " << uvd1[i].y << " " << uvd1[i].z << " " << uvd2[i].x << " " << uvd2[i].y << " " << uvd2[i].z << " "
-//      << std_d1 <<  " " << std_d2;
-//    std::string res = exec(cmd.str());
-//    std::cout << res << std::endl;
-//
-//    std::string buff;
-//    std::stringstream ss(res);
-//
-//    std::vector<double> tokens;
-//    while(ss>>buff)
-//      tokens.push_back(std::stod(buff));
-//    Eigen::Matrix<double, 3, 3> pySqrtInfo;
-//    for (int i = 0; i < 3; i++)
-//    {
-//      for (int j = 0; j < 3; j++)
-//      {
-//        pySqrtInfo(j,i) = tokens.at(3*i+j);
-//      }
-//    }
-//    spdlog::get("console")->trace("pySqrtInfo:"
-//        "\n{: f}    {: f}    {: f}\n{: f}    {: f}    {: f}\n{: f}    {: f}    {: f}",
-//        pySqrtInfo(0,0), pySqrtInfo(0,1), pySqrtInfo(0,2),
-//        pySqrtInfo(1,0), pySqrtInfo(1,1), pySqrtInfo(1,2),
-//        pySqrtInfo(2,0), pySqrtInfo(2,1), pySqrtInfo(2,2));
   }
 }
-
 
 Covariances covo::Uncertainty::getCovariances() const
 {

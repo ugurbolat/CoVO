@@ -5,7 +5,6 @@
 #include <spdlog/sinks/stdout_color_sinks.h>
 
 #include <opencv2/opencv.hpp>
-#include <opencv2/xfeatures2d.hpp>
 #include <opencv2/features2d.hpp>
 #include <opencv2/imgcodecs.hpp>
 #include <opencv2/highgui.hpp>
@@ -116,7 +115,11 @@ void covo::Feature::detectOrbFeatures()
       edge_threshold,
       first_level,
       wta_k,
+#if CV_VERSION_MAJOR >= 4
+      static_cast<cv::ORB::ScoreType>(score_type),
+#else
       score_type,
+#endif
       patch_size,
       fast_threshold
       );
